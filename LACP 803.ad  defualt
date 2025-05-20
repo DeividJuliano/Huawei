@@ -1,0 +1,75 @@
+Configurando LACP huawei
+LACP (Link Aggregation Control Protocol) é um protocolo de rede que permite agrupar várias conexões físicas (links) em um único link lógico, aumentando a largura
+de banda e a redundância de uma rede. Em outras palavras, ele cria um grupo de links (LAG - Link Aggregation Group) que funciona como uma única conexão, aumentando
+a capacidade de transmissão de dados e garantindo que a rede continue funcionando mesmo se um dos links
+
+Será agregado interfaces de um router e um switch
+Router
+system-view
+sysname R1
+interface Eth-trunk 1  #cria uma interface trunk
+description lacp    #adiciona o comentário lacp 
+dysplay this
+q
+
+#vincular interfaces a Ethertrunk criada
+
+interface GigabitEthernet 0/0/1
+eth-trunk 1
+q
+interface GigabitEthernet 0/0/2
+eth-trunk 1
+q
+
+#criando vlan
+vlan 100
+q
+
+#atribuir um ip a vlan
+interface vlanif 100
+ip address 172.19.0.14 30    #não use barra, só espaço para inserir a máscara de sub-rede
+q
+
+#adicionar a vlan 100 em uma interface
+interface Ether-Trunk 1
+portswitch
+port link-type trunk
+port trunk allow-pass vlan 100
+dysplay this
+q
+
+switch
+#nomear e criar um interface trunk
+system-view
+sysname SW01
+interface Ether-Trunk 1
+description lacp
+display this
+q
+
+#vincular interfaces a Ethertrunk criada
+
+interface GigabitEthernet 0/0/1
+eth-trunk 1
+q
+interface GigabitEthernet 0/0/2
+eth-trunk 1
+q
+
+#criando vlan
+vlan 100
+q
+
+#atribuir um ip a vlan
+interface vlanif 100
+ip address 172.19.0.13 30    #não use barra, só espaço para inserir a máscara de sub-rede
+q
+
+#adicionar a vlan 100 em uma interface
+interface Ether-Trunk 1
+port link-type trunk    #equivale há uma vlan taggeada
+port trunk allow-pass vlan 100
+dysplay this
+q
+ping 172.19.0.14   #testar comunicação com o router
+#nesta configuração temos redundância e agregação ao mesmo tempo, somando as interfaces, 2 interfaces de 1 GB se torna uma de 2GB (LACP 803.ad  defualt)
