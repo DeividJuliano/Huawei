@@ -1,0 +1,14 @@
+# OLT padrão IP 10.11.104.2  user: root password:admin123 acesse por ssh ou Mikrotik
+
+enable
+config   # modo privilegiado
+
+# CRIAR LINE PROFILE
+
+ont-lineprofile gpon profile-id 101 profile-name TESTE
+ 
+MA5800-X2(config-gpon-lineprofile-101)#tcont 1 dba-profile-id 101
+  MA5800-X2(config-gpon-lineprofile-101)#gem add 101 eth tcont 1
+  MA5800-X2(config-gpon-lineprofile-101)#gem mapping 101 0 vlan 1001 
+  MA5800-X2(config-gpon-lineprofile-101)#commit
+  MA5800-X2(config-gpon-lineprofile-101)#quit
