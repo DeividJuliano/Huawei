@@ -1,4 +1,5 @@
 # OLT padrão IP 10.11.104.2  user: root password:admin123 acesse por ssh ou Mikrotik
+system ssh 172.16.10.2 user=root  #acessar a olt via mikrotik
 
 enable
 config   # modo privilegiado
@@ -32,30 +33,23 @@ vlan 101 to 116 smart   #vlan de serviço não precisa de IP
 #VINCULAR AS VLANS NA PORTA DE UPLINK
 port vlan 1100 0/3 0
 port vlan 101 to 116 0/3 0
-  
-  
 
-  // ADICIONAR IP NA VLAN DE GERENCIA
+#VALIDAR AS CONFIGURAÇÕES
+enable
+config
+board confirm ?
+display board 0
+board confirm 0/0
+board confirm 0/1
   
-  
-  MA5800-X2(config)#
-  MA5800-X2(config-if-vlanif1100)#
-  
-   =======================================================================================================================================
-
-  // ADICIONAR ONT
-  
-  MA5800-X2(config)#display board 0
-  MA5800-X2(config)#board confirm 0/0
-  MA5800-X2(config)#board confirm 0/1
-  
-  =======================================================================================================================================
-
-  // ADICIONAR ONT
-  
-  MA5800-X2(config)#display ont autofind all
-  MA5800-X2(config)#interface gpon 0/3
-  MA5800-X2(config-if-gpon-0/3)#ont add 0 sn-auth "*****************" omci ont-lineprofile-id 101 ont-srvprofile-id 101 desc "onu-teste"
-  MA5800-X2(config-if-gpon-0/3)#ont port native-vlan 7 23 eth 1 vlan 1001
-  MA5800-X2(config-if-gpon-0/3)#quit
-  MA5800-X2(config)#service-port vlan 101 gpon 0/0/0 ont 0 gemport 101 multi-service user-vlan 1001
+#ATIVAR AS POTRAS ONT
+port 0 ont-auto-find enable  #ativa a busca automática das onus na porrta 0
+port 1 ont-auto-find enable  #ativa a busca automática das onus na porrta 1
+display ont autofind all   #mostra a ont encontrada junto com seus parametros 
+interface gpon 0/0
+ont confirm 0 sn-auth ################ omci ont-lineprofile-id 101 ont-srvprofile-id 101 desc onulab   #no lugar do ##, coloque o sn que aparece no resultado 
+#do comando autofind (ont Sn, só os números cerda de 16 números)
+#ont add 0 sn-auth "*****************" omci ont-lineprofile-id 101 ont-srvprofile-id 101 desc onu-teste  #talves esse comando necessário testar
+ont port native-vlan 0 0 eth 1 vlan 1001
+quit
+service-port vlan 101 gpon 0/0/0 ont 0 gemport 101 multi-service user-vlan 1001
