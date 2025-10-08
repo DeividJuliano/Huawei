@@ -12,3 +12,69 @@ MA5800-X2(config-gpon-lineprofile-101)#tcont 1 dba-profile-id 101
   MA5800-X2(config-gpon-lineprofile-101)#gem mapping 101 0 vlan 1001 
   MA5800-X2(config-gpon-lineprofile-101)#commit
   MA5800-X2(config-gpon-lineprofile-101)#quit
+
+  // CRIAR DBA
+
+  MA5800-X2(config)#dba-profile add profile-id 101 profile-name 1GIGA type4 max 1024000
+
+=======================================================================================================================================
+
+  // CRIAR LINE PROFILE
+
+  MA5800-X2(config)#ont-lineprofile gpon profile-id 101 profile-name TESTE
+  MA5800-X2(config-gpon-lineprofile-101)#tcont 1 dba-profile-id 101
+  MA5800-X2(config-gpon-lineprofile-101)#gem add 101 eth tcont 1
+  MA5800-X2(config-gpon-lineprofile-101)#gem mapping 101 0 vlan 1001 
+  MA5800-X2(config-gpon-lineprofile-101)#commit
+  MA5800-X2(config-gpon-lineprofile-101)#quit
+  
+  
+  =======================================================================================================================================
+
+  // CRIAR SERVER PROFILE
+  
+  MA5800-X2(config)#ont-srvprofile gpon profile-id 101 profile-name "HG8010"
+  MA5800-X2(config-gpon-srvprofile-101)#ont-port pots adaptive eth adaptive
+  MA5800-X2(config-gpon-srvprofile-101)#MA5800-X2(config)#commit
+  MMA5800-X2(config-gpon-srvprofile-101)##quit
+  
+  =======================================================================================================================================
+
+  // CRIAR VLANS
+  
+  MA5800-X2(config)#vlan 1100 smart 
+  MA5800-X2(config)#vlan 101 to 116 smart 
+  
+  =======================================================================================================================================
+
+  // ADICIONAR VLANS NA PORTA DE UPLINK
+  
+  MA5800-X2(config)#port vlan 1100 0/3 0
+  MA5800-X2(config)#port vlan 101 to 116 0/3 0
+  
+   =======================================================================================================================================
+
+  // ADICIONAR IP NA VLAN DE GERENCIA
+  
+  
+  MA5800-X2(config)#interface vlanif 1100
+  MA5800-X2(config-if-vlanif1100)#ip address 172.16.10.2 255.255.255.252
+  
+   =======================================================================================================================================
+
+  // ADICIONAR ONT
+  
+  MA5800-X2(config)#display board 0
+  MA5800-X2(config)#board confirm 0/0
+  MA5800-X2(config)#board confirm 0/1
+  
+  =======================================================================================================================================
+
+  // ADICIONAR ONT
+  
+  MA5800-X2(config)#display ont autofind all
+  MA5800-X2(config)#interface gpon 0/3
+  MA5800-X2(config-if-gpon-0/3)#ont add 0 sn-auth "*****************" omci ont-lineprofile-id 101 ont-srvprofile-id 101 desc "onu-teste"
+  MA5800-X2(config-if-gpon-0/3)#ont port native-vlan 7 23 eth 1 vlan 1001
+  MA5800-X2(config-if-gpon-0/3)#quit
+  MA5800-X2(config)#service-port vlan 101 gpon 0/0/0 ont 0 gemport 101 multi-service user-vlan 1001
