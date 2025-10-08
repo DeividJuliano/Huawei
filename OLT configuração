@@ -3,62 +3,43 @@
 enable
 config   # modo privilegiado
 
-# CRIAR LINE PROFILE
+#CRIAR DBA
+dba-profile add profile-id 101 profile-name 1GIGA type4 max 1024000
 
+#CRIAR LINE PROFILE
 ont-lineprofile gpon profile-id 101 profile-name TESTE
- 
-MA5800-X2(config-gpon-lineprofile-101)#tcont 1 dba-profile-id 101
-  MA5800-X2(config-gpon-lineprofile-101)#gem add 101 eth tcont 1
-  MA5800-X2(config-gpon-lineprofile-101)#gem mapping 101 0 vlan 1001 
-  MA5800-X2(config-gpon-lineprofile-101)#commit
-  MA5800-X2(config-gpon-lineprofile-101)#quit
+tcont 1 dba-profile-id 101
+gem add 101 eth tcont 1
+gem mapping 101 0 vlan 1001 
+commit
+quit
+  
+#CRIAR SERVER PROFILE
+ont-srvprofile gpon profile-id 101 profile-name HG8010
+ont-port eth adaptive pots adaptive
+commit
+quit
+  
+#CRIAR VLAN PARA GERENCIAR
+vlan 1100 smart 
+interface vlanif 1100
+ip address 172.16.10.2 255.255.255.252 #ip de gerenciamento
+quit
 
-  // CRIAR DBA
-
-  MA5800-X2(config)#dba-profile add profile-id 101 profile-name 1GIGA type4 max 1024000
-
-=======================================================================================================================================
-
-  // CRIAR LINE PROFILE
-
-  MA5800-X2(config)#ont-lineprofile gpon profile-id 101 profile-name TESTE
-  MA5800-X2(config-gpon-lineprofile-101)#tcont 1 dba-profile-id 101
-  MA5800-X2(config-gpon-lineprofile-101)#gem add 101 eth tcont 1
-  MA5800-X2(config-gpon-lineprofile-101)#gem mapping 101 0 vlan 1001 
-  MA5800-X2(config-gpon-lineprofile-101)#commit
-  MA5800-X2(config-gpon-lineprofile-101)#quit
+#CRIAR VLAN DE SERVIÇOS
+vlan 101 to 116 smart   #vlan de serviço não precisa de IP
+  
+#VINCULAR AS VLANS NA PORTA DE UPLINK
+port vlan 1100 0/3 0
+port vlan 101 to 116 0/3 0
   
   
-  =======================================================================================================================================
-
-  // CRIAR SERVER PROFILE
-  
-  MA5800-X2(config)#ont-srvprofile gpon profile-id 101 profile-name "HG8010"
-  MA5800-X2(config-gpon-srvprofile-101)#ont-port pots adaptive eth adaptive
-  MA5800-X2(config-gpon-srvprofile-101)#MA5800-X2(config)#commit
-  MMA5800-X2(config-gpon-srvprofile-101)##quit
-  
-  =======================================================================================================================================
-
-  // CRIAR VLANS
-  
-  MA5800-X2(config)#vlan 1100 smart 
-  MA5800-X2(config)#vlan 101 to 116 smart 
-  
-  =======================================================================================================================================
-
-  // ADICIONAR VLANS NA PORTA DE UPLINK
-  
-  MA5800-X2(config)#port vlan 1100 0/3 0
-  MA5800-X2(config)#port vlan 101 to 116 0/3 0
-  
-   =======================================================================================================================================
 
   // ADICIONAR IP NA VLAN DE GERENCIA
   
   
-  MA5800-X2(config)#interface vlanif 1100
-  MA5800-X2(config-if-vlanif1100)#ip address 172.16.10.2 255.255.255.252
+  MA5800-X2(config)#
+  MA5800-X2(config-if-vlanif1100)#
   
    =======================================================================================================================================
 
